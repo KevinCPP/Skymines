@@ -23,7 +23,7 @@ public class MineFactory implements Listener {
 
     @EventHandler
     public void onContainerOpened(InventoryCloseEvent e){
-
+        System.out.println("an inventory was closed");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
