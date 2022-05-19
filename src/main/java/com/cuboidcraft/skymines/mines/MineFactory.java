@@ -1,4 +1,4 @@
-package com.cuboidcraft.skymines;
+package com.cuboidcraft.skymines.mines;
 
 import com.iridium.iridiumskyblock.api.IridiumSkyblockAPI;
 import com.iridium.iridiumskyblock.api.IslandCreateEvent;

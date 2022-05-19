@@ -1,4 +1,4 @@
-package com.cuboidcraft.skymines;
+package com.cuboidcraft.skymines.util;
 
 import org.bukkit.Location;
 import java.util.Iterator;

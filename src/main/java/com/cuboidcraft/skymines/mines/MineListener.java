@@ -1,4 +1,4 @@
-package com.cuboidcraft.skymines;
+package com.cuboidcraft.skymines.mines;
 
 import com.iridium.iridiumskyblock.api.IslandCreateEvent;
 import org.bukkit.Bukkit;
@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+
 
 public class MineListener implements Listener {
     Plugin plugin;
@@ -21,9 +22,7 @@ public class MineListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onIslandCreate(IslandCreateEvent e) {
-        Utility.getInst().log("island was created");
+        Bukkit.getLogger().info("Island Create Event");
         names.add(e.getUser().getName());
-
-
     }
 }

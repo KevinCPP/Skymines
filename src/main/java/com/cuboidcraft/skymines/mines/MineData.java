@@ -1,5 +1,7 @@
-package com.cuboidcraft.skymines;
+package com.cuboidcraft.skymines.mines;
 
+import com.cuboidcraft.skymines.util.Box;
+import com.cuboidcraft.skymines.util.MaterialParser;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +23,6 @@ public class MineData {
 
     //type of mine
     private String mineType;
-    private boolean hasBorder = false;
     private int borderThickness = 1;
     private EnumMap<Material, Integer> materials;
 
@@ -42,7 +43,6 @@ public class MineData {
     public UUID getOwner() {
         return Owner;
     }
-
     public void setOwner(UUID owner) {
         Owner = owner;
     }
@@ -60,27 +60,15 @@ public class MineData {
         maxZ = b.maxZ;
         worldName = b.world.getName();
     }
-
     public String getMineType() {
         return mineType;
     }
-
     public void setMineType(String minetype) {
         mineType = minetype;
     }
-
-    public boolean hasBorder() {
-        return hasBorder;
-    }
-
-    public void setHasBorder(boolean hasBorder) {
-        this.hasBorder = hasBorder;
-    }
-
     public int getBorderThickness() {
         return borderThickness;
     }
-
     public boolean setBorderThickness(int borderThickness) {
         int width = maxX - minX;
         int length = maxZ - minZ;
