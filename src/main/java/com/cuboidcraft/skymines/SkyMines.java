@@ -1,10 +1,10 @@
 package com.cuboidcraft.skymines;
 
+import com.cuboidcraft.skymines.mines.MineFactory;
+import com.cuboidcraft.skymines.mines.MineListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
 
 
 public class SkyMines extends JavaPlugin {
@@ -15,9 +15,8 @@ public class SkyMines extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
-        new Utility(this);
-        this.getCommand("boxtest").setExecutor(new Commands());
-        this.getCommand("resetmine").setExecutor(new Commands());
+        this.getCommand("boxtest").setExecutor(new Commands(this));
+        this.getCommand("resetmine").setExecutor(new Commands(this));
     }
 
     public void registerListeners(){

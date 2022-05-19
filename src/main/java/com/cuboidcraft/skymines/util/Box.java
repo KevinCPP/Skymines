@@ -1,4 +1,4 @@
-package com.cuboidcraft.skymines;
+package com.cuboidcraft.skymines.util;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,8 +10,8 @@ import java.util.*;
 public class Box implements Iterable<Location> {
    public Location pos1, pos2;
 
-   World world;
-   int minX, minY, minZ, maxX, maxY, maxZ;
+   public World world;
+   public int minX, minY, minZ, maxX, maxY, maxZ;
 
    //disable default constructor
    @SuppressWarnings("unused")
@@ -52,6 +52,10 @@ public class Box implements Iterable<Location> {
    public boolean isWithinNblocksOfEdge(Location loc, int N, boolean testY){
        //we only want to test inside of the box
        if(!isInside(loc))
+           return false;
+
+       //if N <= 0, then it will always be false
+       if(N <= 0)
            return false;
 
        //test if X is within N blocks of the edge

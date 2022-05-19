@@ -1,13 +1,16 @@
-package com.cuboidcraft.skymines;
+package com.cuboidcraft.skymines.mines;
 
+import com.cuboidcraft.skymines.util.Box;
+import com.cuboidcraft.skymines.util.MaterialBag;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class Mine {
-
     //material to be used for the border
     private static final Material borderMaterial = Material.BEDROCK;
     //data used to construct the mine
@@ -21,18 +24,15 @@ public class Mine {
 
     public Mine(@NotNull MineData data){
         mineData = data;
-        //material bag that will be used to pick a random block from
-        //so the mine's blocks can be "randomized"
         materialBag = new MaterialBag(data.getMaterials());
         //reset so that the mine will spawn in the world as soon as it's created
         reset();
     }
-
     //teleport players to the top/center of the mine.
     public void teleportPlayersOut(){
         //loop through each player, and if they are inside the mine,
         //teleport them to be on top of the mine in the middle
-        for(Player p : Utility.getInst().getOnlinePlayers())
+        for(Player p : Bukkit.getOnlinePlayers())
             if(mineData.getBox().isInside(p.getLocation()))
                 p.teleport(mineData.getBox().getTopMiddle());
     }
@@ -52,13 +52,14 @@ public class Mine {
 
             //if the mine should have a bedrock border, then
             //generate it (with the proper thickness)
-            if (mineData.hasBorder() && b.isWithinNblocksOfEdge(curr, thickness, false)) {
+            if (b.isWithinNblocksOfEdge(curr, thickness, false)) {
                 block.setType(borderMaterial);
                 continue;
             }
 
             //set the block to be a random material from the materialBag
-            block.setType(materialBag.nextMaterial());
+            if(block.getType() == Material.AIR)
+                block.setType(materialBag.nextMaterial());
         }
     }
 
