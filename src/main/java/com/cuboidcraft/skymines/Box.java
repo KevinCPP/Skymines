@@ -1,30 +1,32 @@
 package com.cuboidcraft.skymines;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.Math;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
-public class Box {
+public class Box implements Iterable<Location> {
    public Location pos1, pos2;
 
    World world;
    int minX, minY, minZ, maxX, maxY, maxZ;
 
+   //disable default constructor
+   @SuppressWarnings("unused")
    private Box() {}
 
    public Box(Location l1, Location l2){
        pos1 = l1;
        pos2 = l2;
-       world = l1.getWorld();
 
-       //default world if they're not equal for some reason
-       if(!l1.getWorld().equals(l2.getWorld()))
-           world = Utility.getInst().getWorld("world");
+       if(l1.getWorld() == null || l2.getWorld() == null)
+           world = null;
+       else if(l1.getWorld() != null && l2.getWorld() != null)
+           world = l2.getWorld();
+       else
+           world = l1.getWorld() == null ? l2.getWorld() : l1.getWorld();
 
        //set all of these variables because they're kind of useful
        //in calculations across multiple different functions
@@ -47,34 +49,47 @@ public class Box {
        return true;
    }
 
+   public boolean isWithinNblocksOfEdge(Location loc, int N, boolean testY){
+       //we only want to test inside of the box
+       if(!isInside(loc))
+           return false;
+
+       //test if X is within N blocks of the edge
+       if(loc.getBlockX() < minX+N || maxX-N < loc.getBlockX())
+           return true;
+
+       //test if Y is within N blocks of the edge
+       if(loc.getBlockZ() < minZ+N || maxZ-N < loc.getBlockZ())
+           return true;
+
+       //if testY is true, we will test the distance like we normally do for X and Z
+       //(testY allows us to have thick walls but a 1 block floor)
+       //we also only test minY because if we test maxY, it'll make a ceiling of bedrock
+       if(testY && loc.getBlockY() < minY+N)
+           return true;
+
+       //we only want a thickness of 1 on the y layer if testY is false
+       if(!testY && loc.getBlockY() == minY)
+           return true;
+
+       //if none of those checks passed, it's not within N blocks of the edge
+       return false;
+   }
+
    public Location getTopMiddle(){
+       //find the middle block on the XZ axis
        int midX = (minX+maxX)/2;
        int midZ = (minZ+maxZ)/2;
-       return new Location(world, midX, maxY, midZ, 0, 0);
+
+       //add 0.5 to midX and midZ so players are teleported to the middle of the block
+       //add 1 to maxY so that players are teleported above the top layer, not inside of it.
+       return new Location(world, (midX + 0.5f), maxY+1, (midZ + 0.5f), 0, 0);
    }
 
-   public boolean fill(HashMap<Material, Integer> mats){
-       Material[] materials = MaterialParser.matsToArr(mats);
-
-       int i = 0;
-       for(int x = minX; x <= maxX; x++){
-           for(int y = minY; y <= maxY; y++){
-               for(int z = minZ; z <= maxZ; z++){
-                   Location curr = new Location(world, x, y, z);
-
-                   if(!world.getBlockAt(curr).isEmpty())
-                       continue;
-
-                   curr.getBlock().setType(materials[i]);
-
-                   i++;
-                   if(i >= materials.length)
-                       i = 0;
-               }
-           }
-       }
-
-       return true;
-   }
+    @NotNull
+    @Override
+    public Iterator<Location> iterator() {
+        return new BoxIterator(this);
+    }
 }
 

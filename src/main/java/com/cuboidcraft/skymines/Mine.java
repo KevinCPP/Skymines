@@ -2,73 +2,71 @@ package com.cuboidcraft.skymines;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import org.jetbrains.annotations.NotNull;
 
 public class Mine {
-    private Box mineBounds;
-    private Location spawnLoc;
 
-    private String mineName;
-
-    HashMap<Material, Integer> makeup = new HashMap<>();
+    //material to be used for the border
+    private static final Material borderMaterial = Material.BEDROCK;
+    //data used to construct the mine
+    private MineData mineData;
+    //container that random materials can be pulled from
+    MaterialBag materialBag;
 
     //disable default constructor
+    @SuppressWarnings("unused")
     private Mine() {}
 
-    public Mine(Box bounds, HashMap<Material, Integer> materials, String name){
-        mineBounds = bounds;
-        makeup = new HashMap<>(materials);
-        spawnLoc = mineBounds.getTopMiddle();
-        mineName = name;
+    public Mine(@NotNull MineData data){
+        mineData = data;
+        //material bag that will be used to pick a random block from
+        //so the mine's blocks can be "randomized"
+        materialBag = new MaterialBag(data.getMaterials());
+        //reset so that the mine will spawn in the world as soon as it's created
+        reset();
     }
 
-    public void setMakeup(HashMap<Material, Integer> materials){
-        makeup = new HashMap<>(materials);
-    }
-
-    public void setSpawn(Location l) {
-        spawnLoc = l;
-    }
-
-    //resets the mine
-    public boolean reset(){
-        teleportPlayersOut();
-        mineBounds.fill(makeup);
-
-        return true;
-    }
-
-    public void setName(String name){
-        mineName = name;
-    }
-
-    public String getName(){
-        return new String(mineName);
-    }
-
-    public boolean nameEquals(String name){
-        return mineName.equals(name);
-    }
-
-    //loop through all players and teleport them outside the mine.
+    //teleport players to the top/center of the mine.
     public void teleportPlayersOut(){
-        for(Player p : Utility.getInst().getOnlinePlayers()){
-            //get the location of the player
-            Location l = p.getLocation();
-            //test if the player is in the same world
-            if(!l.getWorld().equals(mineBounds.world))
+        //loop through each player, and if they are inside the mine,
+        //teleport them to be on top of the mine in the middle
+        for(Player p : Utility.getInst().getOnlinePlayers())
+            if(mineData.getBox().isInside(p.getLocation()))
+                p.teleport(mineData.getBox().getTopMiddle());
+    }
+
+    public void reset(){
+        //first teleport players out to make sure nobody is in there
+        teleportPlayersOut();
+        //get bounding box that we will use to make the mine
+        Box b = mineData.getBox();
+        //thickness of the walls
+        int thickness = mineData.getBorderThickness();
+
+        //loop through each block location in the 3D box for this mine
+        for (Location curr : b) {
+            //get the block at the current location
+            Block block = b.world.getBlockAt(curr);
+
+            //if the mine should have a bedrock border, then
+            //generate it (with the proper thickness)
+            if (mineData.hasBorder() && b.isWithinNblocksOfEdge(curr, thickness, false)) {
+                block.setType(borderMaterial);
                 continue;
-            //if they're in the same world, test if they're
-            //inside the mine's bounding box
-            if(!mineBounds.isInside(l))
-                continue;
-            //if so, teleport them to the spawnLoc (outside the mine)
-            p.teleport(spawnLoc);
+            }
+
+            //set the block to be a random material from the materialBag
+            block.setType(materialBag.nextMaterial());
         }
     }
 
+    public MineData getMineData() {
+        return mineData;
+    }
+
+    public void setMineData(MineData data) {
+        mineData = data;
+    }
 }

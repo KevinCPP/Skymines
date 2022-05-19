@@ -1,9 +1,18 @@
 name: Skymines
 version: '${project.version}'
-main: com.cuboidcraft.skymines.Skymines
+main: com.cuboidcraft.skymines.SkyMines
 api-version: 1.18
 prefix: SkyMines
 depend: [IridiumSkyblock]
 authors: [SunsetAssassin]
 description: Generates a prison mine on everyone's skyblock island in iridiumSkyblock
 website: www.cuboidcraft.com
+commands:
+  boxtest:
+    description: tests generation of a box of stone
+    usage: /boxtest
+    permission: skymines.boxtest
+  resetmine:
+    description: resets your mine
+    usage: /resetmine
+    permission: skymines.resetmine

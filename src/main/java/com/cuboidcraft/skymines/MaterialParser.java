@@ -4,32 +4,44 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 
 public class MaterialParser {
+    //disable constructor
+    @SuppressWarnings("unused")
+    private MaterialParser() {}
 
-    public static Material[] matsToArr(HashMap<Material, Integer> input){
+    public static Material[] materialMapToArray(EnumMap<Material, Integer> input){
+        System.out.println("materialMapToArray debug");
+
         int total = 0;
-        for(HashMap.Entry<Material, Integer> e : input.entrySet()){
+        for(EnumMap.Entry<Material, Integer> e : input.entrySet()){
             total += e.getValue();
+            System.out.println(e.toString());
         }
 
-        ArrayList<Material> mats = new ArrayList<>(100);
+        ArrayList<Material> materialList = new ArrayList<>(100);
 
-        for(HashMap.Entry<Material, Integer> e : input.entrySet()){
-            for(int i = 0; i < 100 * (e.getValue()/total); i++){
-                mats.add(e.getKey());
+        for(EnumMap.Entry<Material, Integer> e : input.entrySet()){
+            int amount = (int)Math.floor(100.f * ((float)e.getValue()/(float)total));
+            for(int i = 0; i < amount; i++){
+                materialList.add(e.getKey());
             }
         }
 
-        Collections.shuffle(mats);
+        Collections.shuffle(materialList);
 
-        return (Material[])mats.toArray();
+        Material[] materialArray = new Material[materialList.size()];
+        for(int i = 0; i < materialList.size(); i++){
+            materialArray[i] = materialList.get(i);
+        }
+
+        return materialArray;
     }
 
     //format: x1%Material1,x2%Material2... x1+x2+... = 100
-    public static HashMap<Material, Integer> strToMap(String s){
-        HashMap<Material, Integer> map = new HashMap<>();
+    public static EnumMap<Material, Integer> strToMap(String s){
+        EnumMap<Material, Integer> map = new EnumMap<>(Material.class);
         //if there are no commas, then there must only be one material
         if(!s.contains(",")){
             //try to turn the string into a material, if it can't be
@@ -50,9 +62,9 @@ public class MaterialParser {
     }
 
     //has no percentage
-    private static HashMap<Material, Integer> mode1(String s){
-        HashMap<Material, Integer> map = new HashMap<>();
-        String arr[] = s.split(",");
+    private static EnumMap<Material, Integer> mode1(String s){
+        EnumMap<Material, Integer> map = new EnumMap<>(Material.class);
+        String[] arr = s.split(",");
         ArrayList<Material> materials = new ArrayList<>();
 
         for(String str : arr){
@@ -83,12 +95,12 @@ public class MaterialParser {
         return map;
     }
 
-    private static HashMap<Material, Integer> mode2(String s){
+    private static EnumMap<Material, Integer> mode2(String s){
         //map that we are going to build
-        HashMap<Material, Integer> map = new HashMap<>();
+        EnumMap<Material, Integer> map = new EnumMap<>(Material.class);
 
         //split the string at every % and , symbol
-        String arr[] = s.split("%|,");
+        String[] arr = s.split("[%,]");
 
         //two arraylists which will be turned into the map
         ArrayList<Integer> percents = new ArrayList<>();
@@ -101,13 +113,13 @@ public class MaterialParser {
         //should be an integer (percentage), and index+1 (every odd index) should be the corresponding
         //material. That is how we will parse it. Every even number will be parsed into an int, and every
         //odd number will be parsed into a material. In theory, this should result in two arraylists of
-        //equal size percents and materials, which we can use to build the hashmap
+        //equal size percents and materials, which we can use to build the EnumMap
         for(int i = 0; i < arr.length; i ++) {
             if((i % 2) == 0) {
                 try {
                     percents.add(Integer.parseInt(arr[i]));
                 } catch (Exception e) {
-                    continue;
+                    e.printStackTrace();
                 }
             } else {
                 Material m = Material.getMaterial(arr[i].toUpperCase());
@@ -123,9 +135,9 @@ public class MaterialParser {
         }
 
         //if there are an equal amount of percents and materials, that means
-        //the syntax was correct and we can go ahead and build the hashmap based
+        //the syntax was correct and we can go ahead and build the EnumMap based
         //off of that. So "10%cobblestone, 20%dirt, 70%stone" will turn into a
-        //hashmap with (cobblestone, 10), (dirt, 20), (stone, 70)
+        //EnumMap with (cobblestone, 10), (dirt, 20), (stone, 70)
         if(percents.size() == materials.size()){
             for(int i = 0; i < materials.size(); i++){
                 if(!map.containsKey(materials.get(i)))

@@ -2,51 +2,34 @@ package com.cuboidcraft.skymines;
 
 import com.iridium.iridiumskyblock.api.IridiumSkyblockAPI;
 import com.iridium.iridiumskyblock.api.IslandCreateEvent;
-import com.iridium.iridiumskyblock.api.IslandDeleteEvent;
-import com.iridium.iridiumskyblock.api.IslandSettingChangeEvent;
-import com.iridium.iridiumskyblock.database.Island;
 
+import com.iridium.iridiumskyblock.database.Island;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.*;
 
-import java.util.Optional;
+public class MineFactory extends BukkitRunnable implements Listener {
 
-public class MineFactory implements Listener {
+    Plugin plugin;
 
-    public MineFactory(){
+    private MineFactory(){}
 
+    public MineFactory(Plugin pl){
+        plugin = pl;
     }
 
-    @EventHandler
-    public void onContainerOpened(InventoryCloseEvent e){
-        System.out.println("an inventory was closed");
-    }
+    //this function will process everyone in names, and it will create the mines on their island.
+    @Override
+    public void run(){
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onIslandCreate(IslandCreateEvent e) {
-        //print 10 times so i don't miss it
-        for(int i = 0; i < 10; i++)
-            System.out.println("The event ran");
-
-        Utility.getInst().log("Debug - Cancelled: " + e.isCancelled());
-
-        Optional<Island> is = IridiumSkyblockAPI.getInstance().getIslandByName(e.getIslandName());
-        Location endCenter = is.get().getCenter(IridiumSkyblockAPI.getInstance().getEndWorld());
-
-        Utility.getInst().log(endCenter.toString());
-    }
-
-    @EventHandler
-    public void onIslandDelete(IslandDeleteEvent e) {
-        System.out.println("an island was deleted!");
-    }
-
-    @EventHandler
-    public void onSettingchanged(IslandSettingChangeEvent e) {
-        System.out.println("setting changed");
     }
 }
